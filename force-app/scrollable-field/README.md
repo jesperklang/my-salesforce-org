@@ -1,1 +1,1 @@
-![Component image](assets/scrollable-field.png)
+![Component image](../../assets/scrollable-field.png)
