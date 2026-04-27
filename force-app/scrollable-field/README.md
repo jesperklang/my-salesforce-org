@@ -1,0 +1,1 @@
+![Component image](assets/scrollable-field.png)

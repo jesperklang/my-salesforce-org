@@ -1,0 +1,11 @@
+{
+  "packageDirectories": [
+    { "path": "force-app", "default": true },
+    { "path": "force-app/scrollable-field" }
+  ],
+  "name": "My Salesforce Org",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "66.0",
+  "defaultLwcLanguage": "javascript"
+}

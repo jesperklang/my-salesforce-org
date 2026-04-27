@@ -1,0 +1,3 @@
+.slds-scrollable_y {
+    height: var(--scrollable-rich-text-height, 240px);
+}
