@@ -2,7 +2,7 @@
 
 Displays a selected field from the current record in a fixed-height, scrollable Lightning card. This is especially useful for long text, rich text, notes, or other fields that can take up too much space on a record page.
 
-![Component image](../../assets/scrollable-field.png)
+![Component image](../../.assets/scrollable-field.png)
 
 ## Component Parameters
 
