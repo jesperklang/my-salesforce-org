@@ -22,8 +22,6 @@
                 type="Integer"
                 label="Height (px)"
                 required="true"
-                min="80"
-                max="1200"
                 default="240"
                 description="Fixed component height in pixels. Content scrolls inside this height."
             />
