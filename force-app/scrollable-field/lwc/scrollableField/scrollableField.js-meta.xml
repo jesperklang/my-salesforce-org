@@ -3,6 +3,7 @@
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
     <masterLabel>Scrollable Field</masterLabel>
+    <description>Displays a selected field from the current record in a fixed-height, scrollable panel especially useful for long text or rich content.</description>
     <targets>
         <target>lightning__RecordPage</target>
     </targets>
