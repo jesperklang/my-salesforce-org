@@ -1,9 +1,13 @@
 {
   "recommendations": [
-    "salesforce.salesforcedx-vscode",
-    "redhat.vscode-xml",
+    "salesforce.salesforcedx-vscode-expanded",
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "financialforce.lana"
+    "streetsidesoftware.code-spell-checker",
+    "VignaeshRamA.sfdx-package-xml-generator",
+    "SwagUp.sf-xml-formatter",
+    "NicolasVuillamy.vscode-sfdx-hardis",
+    "Gruntfuggly.todo-tree",
+    "usernamehw.errorlens",
+    "bierner.github-markdown-preview"
   ]
 }
