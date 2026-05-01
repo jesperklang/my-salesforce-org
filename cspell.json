@@ -1,0 +1,21 @@
+{
+    // Version of the setting file.  Always 0.2
+    "version": "0.2",
+    // language - current active spelling language
+    "language": "en",
+        "dictionaryDefinitions": [
+        {
+            "name": "Salesforce Dictionary",
+            "path": "spell-checker-dictionaries/salesforce-dictionary.txt"
+        },
+        {
+            "name": "Misc Dev Dictionary",
+            "path": "spell-checker-dictionaries/misc-dev-dictionary.txt"
+        },
+        {
+            "name": "Company Dictionary",
+            "path": "spell-checker-dictionaries/company-dictionary.txt"
+        }
+    ],
+    "dictionaries": ["Salesforce Dictionary", "Misc Dev Dictionary", "Company Dictionary"]
+}
