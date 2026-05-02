@@ -15,3 +15,4 @@ This is useful for fields that can contain a lot of content, such as long text a
 ### - Code Editor Configuration
 #### 1. [Spelling Dictionaries](spell-checker-dictionaries)
 This folder contains custom dictionaries for the Code Spell Checker extension in VS Code, which I use for spell checking my code and comments. The dictionaries include Salesforce-specific terms, general development terms, and company-specific terms that you can specify for your Company.
+#### 2. More to come...
