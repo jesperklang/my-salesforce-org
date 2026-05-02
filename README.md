@@ -6,8 +6,12 @@ More solutions will be added over time.
 
 ## Included Solutions
 
-### [Scrollable Field](force-app/scrollable-field)
+### - [Scrollable Field](force-app/scrollable-field)
 
 Scrollable Field is a LWC for Salesforce record pages. It displays one selected field from the current record inside a fixed-height Lightning card with its own scroll area. Works on any Object's record page.
 
 This is useful for fields that can contain a lot of content, such as long text areas, rich text fields or other fields that would otherwise take up too much space on a record page. Instead of letting a single field stretch the page, the component keeps the layout compact while still making the full field value available to the user.
+
+### - Code Editor Configuration
+#### 1. [Spelling Dictionaries](spell-checker-dictionaries)
+This folder contains custom dictionaries for the Code Spell Checker extension in VS Code, which I use for spell checking my code and comments. The dictionaries include Salesforce-specific terms, general development terms, and company-specific terms that you can specify for your Company.
