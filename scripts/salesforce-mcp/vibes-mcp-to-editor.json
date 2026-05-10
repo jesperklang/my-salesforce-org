@@ -1,3 +1,10 @@
+/*
+ * This file is used to configure the Salesforce MCP to Editor script.
+ * It allows you to specify which telemetry to send, which GA tools to use, and which toolsets and tools to ignore.
+ * For more information, see the README in the scripts/salesforce-mcp folder.
+ */
+
+/* Example configuration:
 {
   "sendTelemetry": false,
   "useNoneGATools": true,
@@ -9,3 +16,4 @@
     "delete_org"
   ]
 }
+*/
