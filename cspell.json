@@ -1,19 +1,32 @@
 {
-    // Version of the setting file.  Always 0.2
-    "version": "0.2",
-        "dictionaryDefinitions": [
-        {
-            "name": "Salesforce Dictionary",
-            "path": "spell-checker-dictionaries/salesforce-dictionary.txt"
-        },
-        {
-            "name": "Misc Dev Dictionary",
-            "path": "spell-checker-dictionaries/misc-dev-dictionary.txt"
-        },
-        {
-            "name": "Company Dictionary",
-            "path": "spell-checker-dictionaries/company-dictionary.txt"
-        }
-    ],
-    "dictionaries": ["Salesforce Dictionary", "Misc Dev Dictionary", "Company Dictionary"]
+  // Version of the setting file.  Always 0.2
+  "version": "0.2",
+  "dictionaryDefinitions": [
+    {
+      "name": "Salesforce Dictionary",
+      "path": "spell-checker-dictionaries/salesforce-dictionary.txt"
+    },
+    {
+      "name": "Misc Dev Dictionary",
+      "path": "spell-checker-dictionaries/misc-dev-dictionary.txt"
+    },
+    {
+      "name": "Company Dictionary",
+      "path": "spell-checker-dictionaries/company-dictionary.txt"
+    }
+  ],
+  "dictionaries": [
+    "Salesforce Dictionary",
+    "Misc Dev Dictionary",
+    "Company Dictionary"
+  ],
+  "ignorePaths": [
+    ".git",
+    ".gitattributes",
+    ".gitignore",
+    ".vscode",
+    ".vscodeignore",
+    "node_modules",
+    "package-lock.json"
+  ]
 }
