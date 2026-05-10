@@ -1,0 +1,19 @@
+{
+	"servers": {
+		"Salesforce DX": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@salesforce/mcp",
+				"--orgs",
+				"DEFAULT_TARGET_ORG",
+				"--toolsets",
+				"core,data,orgs,metadata,testing,users,mobile,mobile-core,aura-experts,lwc-experts,code-analysis,scale-products,enrichment,experts-validation,other",
+				"--tools",
+				"assign_permission_set,get_username,list_all_orgs,open_org,run_soql_query,resume_tool_operation,retrieve_metadata,run_agent_test,run_apex_test,run_code_analyzer,describe_code_analyzer_rule,list_code_analyzer_rules,query_code_analyzer_results,get_ast_nodes_to_generate_xpath,create_custom_rule,verify_aura_migration_completeness,guide_figma_to_lwc_conversion,create_lwc_component_from_prd,create_lwc_jest_tests,guide_component_accessibility,guide_lwc_best_practices,guide_lwc_development,guide_lwc_rtl_support,review_lwc_jest_tests,orchestrate_lwc_component_creation,orchestrate_lwc_component_optimization,orchestrate_lwc_component_testing,explore_lds_uiapi,guide_lds_data_consistency,guide_lds_development,guide_lds_referential_integrity,run_lwc_accessibility_jest_tests,orchestrate_lwc_slds2_uplift,guide_lws_security,orchestrate_lds_data_requirements,guide_lds_graphql,create_lds_graphql_read_query,create_lds_graphql_mutation_query,fetch_lds_graphql_schema,test_lds_graphql_query,guide_design_general,create_lightning_type,guide_utam_generation,guide_lbc_usage,explore_lbc_components,explore_slds_blueprints,guide_slds_blueprints,explore_slds_styling,guide_slds_styling,reference_lwc_compilation_error,guide_lo_migration,validate_and_optimize,score_issues,create_aura_blueprint_draft,enhance_aura_blueprint_draft,transition_prd_to_lwc,orchestrate_aura_migration,get_mobile_lwc_offline_analysis,get_mobile_lwc_offline_guidance,create_mobile_lwc_app_review,create_mobile_lwc_ar_space_capture,create_mobile_lwc_barcode_scanner,create_mobile_lwc_biometrics,create_mobile_lwc_calendar,create_mobile_lwc_contacts,create_mobile_lwc_document_scanner,create_mobile_lwc_geofencing,create_mobile_lwc_location,create_mobile_lwc_nfc,create_mobile_lwc_payments,scan_apex_class_for_antipatterns,enrich_metadata",
+				"--allow-non-ga-tools",
+				"--no-telemetry"
+			]
+		}
+	}
+}

@@ -8,6 +8,7 @@
     "NicolasVuillamy.vscode-sfdx-hardis",
     "Gruntfuggly.todo-tree",
     "usernamehw.errorlens",
-    "bierner.github-markdown-preview"
+    "bierner.github-markdown-preview",
+    "bierner.markdown-mermaid",
   ]
 }
