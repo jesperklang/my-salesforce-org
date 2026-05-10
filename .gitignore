@@ -49,3 +49,4 @@ $RECYCLE.BIN/
 
 # Custom
 force-app/main
+.agents/
