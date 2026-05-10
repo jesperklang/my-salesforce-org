@@ -13,8 +13,6 @@
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
-    "prepare": "husky || true",
-    "precommit": "lint-staged",
     "upsert:salesforce-mcp": "node scripts/salesforce-mcp/sfdx_mcp_to_vscode.ts",
     "upsert:salesforce-skills": "node scripts/salesforce-skills/import-salesforce-skills.ts"
   },
