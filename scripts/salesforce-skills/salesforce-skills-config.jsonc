@@ -1,0 +1,10 @@
+/*
+ * This file is used to configure the Salesforce Skills script.
+ * It allows you to specify which skills to ignore when importing skills into VS Code.
+ * For more information, see the README in the scripts/salesforce-skills folder.
+ */
+
+{
+    "installedVersion": "1.7.5",
+    "ignoreSkills": []
+}

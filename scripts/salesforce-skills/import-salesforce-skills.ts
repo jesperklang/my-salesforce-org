@@ -13,8 +13,15 @@ const TARGET_PATH = path.join(process.cwd(), ".agents", "skills");
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const CONFIG_PATH = path.join(
   SCRIPT_DIRECTORY,
-  "salesforce-skills-config.json"
+  "salesforce-skills-config.jsonc",
 );
+const CONFIG_HEADER = `/*
+ * This file is used to configure the Salesforce Skills script.
+ * It allows you to specify which skills to ignore when importing skills into VS Code.
+ * For more information, see the README in the scripts/salesforce-skills folder.
+ */
+
+`;
 const GREEN = "\x1b[32m";
 const BLUE = "\x1b[34m";
 const RED = "\x1b[31m";
@@ -43,15 +50,26 @@ function hasErrorCode(error: unknown, code: string): boolean {
   return error instanceof Error && "code" in error && error.code === code;
 }
 
+function stripJsonComments(content: string): string {
+  return content
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s*\/\/.*$/gm, "")
+    .trim();
+}
+
+function stripJsonTrailingCommas(content: string): string {
+  return content.replace(/,\s*([}\]])/g, "$1");
+}
+
 function run(
   command: string,
   args: string[],
-  options: RunOptions = {}
+  options: RunOptions = {},
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
-      stdio: ["ignore", "pipe", "pipe"]
+      stdio: ["ignore", "pipe", "pipe"],
     });
 
     let stdout = "";
@@ -77,8 +95,8 @@ function run(
       const output = [stdout.trim(), stderr.trim()].filter(Boolean).join("\n");
       reject(
         new Error(
-          `${command} ${args.join(" ")} failed with code ${code}.${output ? `\n${output}` : ""}`
-        )
+          `${command} ${args.join(" ")} failed with code ${code}.${output ? `\n${output}` : ""}`,
+        ),
       );
     });
   });
@@ -105,7 +123,7 @@ async function resolveLatestReleaseTag(): Promise<string> {
 
   if (!repositoryPath) {
     throw new Error(
-      `Latest release lookup only supports GitHub repository URLs. Set SALESFORCE_SKILLS_REF to clone a branch, tag, or commit from ${REPO_URL}.`
+      `Latest release lookup only supports GitHub repository URLs. Set SALESFORCE_SKILLS_REF to clone a branch, tag, or commit from ${REPO_URL}.`,
     );
   }
 
@@ -114,14 +132,14 @@ async function resolveLatestReleaseTag(): Promise<string> {
     {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": "salesforce-skills-importer"
-      }
-    }
+        "User-Agent": "salesforce-skills-importer",
+      },
+    },
   );
 
   if (!response.ok) {
     throw new Error(
-      `Could not find latest GitHub release for ${REPO_URL}: ${response.status} ${response.statusText}. Set SALESFORCE_SKILLS_REF to clone a branch, tag, or commit.`
+      `Could not find latest GitHub release for ${REPO_URL}: ${response.status} ${response.statusText}. Set SALESFORCE_SKILLS_REF to clone a branch, tag, or commit.`,
     );
   }
 
@@ -129,7 +147,7 @@ async function resolveLatestReleaseTag(): Promise<string> {
 
   if (typeof release.tag_name !== "string" || !release.tag_name) {
     throw new Error(
-      `Latest GitHub release for ${REPO_URL} did not include a tag_name. Set SALESFORCE_SKILLS_REF to clone a branch, tag, or commit.`
+      `Latest GitHub release for ${REPO_URL} did not include a tag_name. Set SALESFORCE_SKILLS_REF to clone a branch, tag, or commit.`,
     );
   }
 
@@ -138,16 +156,17 @@ async function resolveLatestReleaseTag(): Promise<string> {
 
 async function readSkillsConfig(): Promise<SkillsConfig> {
   try {
-    const config = JSON.parse(
-      await fs.readFile(CONFIG_PATH, "utf8")
-    ) as SkillsConfig;
+    const content = stripJsonTrailingCommas(
+      stripJsonComments(await fs.readFile(CONFIG_PATH, "utf8")),
+    );
+    const config = content ? (JSON.parse(content) as SkillsConfig) : {};
 
     if (
       config.installedVersion !== undefined &&
       typeof config.installedVersion !== "string"
     ) {
       throw new Error(
-        `${path.relative(process.cwd(), CONFIG_PATH)} installedVersion must be a string.`
+        `${path.relative(process.cwd(), CONFIG_PATH)} installedVersion must be a string.`,
       );
     }
 
@@ -156,13 +175,13 @@ async function readSkillsConfig(): Promise<SkillsConfig> {
       !Array.isArray(config.ignoreSkills)
     ) {
       throw new Error(
-        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills must be an array.`
+        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills must be an array.`,
       );
     }
 
     if (config.ignoreSkills?.some((skill) => typeof skill !== "string")) {
       throw new Error(
-        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills values must be strings.`
+        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills values must be strings.`,
       );
     }
 
@@ -172,11 +191,11 @@ async function readSkillsConfig(): Promise<SkillsConfig> {
           skill.includes("/") ||
           skill.includes("\\") ||
           skill === "." ||
-          skill === ".."
+          skill === "..",
       )
     ) {
       throw new Error(
-        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills values must be top-level folder names.`
+        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills values must be top-level folder names.`,
       );
     }
 
@@ -192,11 +211,14 @@ async function readSkillsConfig(): Promise<SkillsConfig> {
 
 async function writeSkillsConfig(config: SkillsConfig): Promise<void> {
   await fs.mkdir(path.dirname(CONFIG_PATH), { recursive: true });
-  await fs.writeFile(CONFIG_PATH, `${JSON.stringify(config, null, 4)}\n`);
+  await fs.writeFile(
+    CONFIG_PATH,
+    `${CONFIG_HEADER}${JSON.stringify(config, null, 4)}\n`,
+  );
 }
 
 async function removeIgnoredSkillFolders(
-  ignoredSkills: Set<string>
+  ignoredSkills: Set<string>,
 ): Promise<string[]> {
   const removedFolders: string[] = [];
   const removals: Promise<string | null>[] = [];
@@ -222,7 +244,7 @@ async function removeIgnoredSkillFolders(
 
           throw error;
         }
-      })()
+      })(),
     );
   });
 
@@ -237,7 +259,7 @@ async function removeIgnoredSkillFolders(
 }
 
 async function listTopLevelDirectories(
-  directoryPath: string
+  directoryPath: string,
 ): Promise<Set<string>> {
   try {
     const entries = await fs.readdir(directoryPath, { withFileTypes: true });
@@ -246,7 +268,7 @@ async function listTopLevelDirectories(
       entries
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name)
-        .sort()
+        .sort(),
     );
   } catch (error) {
     if (hasErrorCode(error, "ENOENT")) {
@@ -259,12 +281,12 @@ async function listTopLevelDirectories(
 
 async function hasSameContents(
   sourcePath: string,
-  targetPath: string
+  targetPath: string,
 ): Promise<boolean> {
   try {
     const [sourceContents, targetContents] = await Promise.all([
       fs.readFile(sourcePath),
-      fs.readFile(targetPath)
+      fs.readFile(targetPath),
     ]);
 
     return sourceContents.equals(targetContents);
@@ -281,10 +303,10 @@ async function listChangedTopLevelDirectories(
   sourcePath: string,
   targetPath: string,
   ignoredSkills: Set<string>,
-  relativePath = ""
+  relativePath = "",
 ): Promise<Set<string>> {
   const entries = await fs.readdir(path.join(sourcePath, relativePath), {
-    withFileTypes: true
+    withFileTypes: true,
   });
   const changedFolders = new Set<string>();
 
@@ -302,7 +324,7 @@ async function listChangedTopLevelDirectories(
           sourcePath,
           targetPath,
           ignoredSkills,
-          entryRelativePath
+          entryRelativePath,
         );
 
         nestedChangedFolders.forEach((folder) => {
@@ -323,7 +345,7 @@ async function listChangedTopLevelDirectories(
       if (!isUnchanged) {
         changedFolders.add(topLevelFolder);
       }
-    })
+    }),
   );
 
   return changedFolders;
@@ -333,13 +355,13 @@ async function listRemovedTopLevelDirectories(
   sourcePath: string,
   targetPath: string,
   ignoredSkills: Set<string>,
-  relativePath = ""
+  relativePath = "",
 ): Promise<Set<string>> {
   let entries;
 
   try {
     entries = await fs.readdir(path.join(targetPath, relativePath), {
-      withFileTypes: true
+      withFileTypes: true,
     });
   } catch (error) {
     if (hasErrorCode(error, "ENOENT")) {
@@ -384,13 +406,13 @@ async function listRemovedTopLevelDirectories(
         sourcePath,
         targetPath,
         ignoredSkills,
-        entryRelativePath
+        entryRelativePath,
       );
 
       nestedRemovedFolders.forEach((folder) => {
         removedFolders.add(folder);
       });
-    })
+    }),
   );
 
   return removedFolders;
@@ -399,7 +421,7 @@ async function listRemovedTopLevelDirectories(
 async function copySkillFolders(
   sourcePath: string,
   targetPath: string,
-  skillFolders: string[]
+  skillFolders: string[],
 ): Promise<void> {
   await fs.mkdir(targetPath, { recursive: true });
 
@@ -410,13 +432,13 @@ async function copySkillFolders(
 
       await fs.rm(targetFolderPath, { force: true, recursive: true });
       await fs.cp(sourceFolderPath, targetFolderPath, { recursive: true });
-    })
+    }),
   );
 }
 
 async function cloneSkillsRepository(
   clonePath: string,
-  ref: string
+  ref: string,
 ): Promise<void> {
   await run("git", [
     "clone",
@@ -427,7 +449,7 @@ async function cloneSkillsRepository(
     "--branch",
     ref,
     REPO_URL,
-    clonePath
+    clonePath,
   ]);
   await run("git", ["sparse-checkout", "set", SOURCE_PATH], { cwd: clonePath });
 }
@@ -446,12 +468,12 @@ async function importSkills(): Promise<ImportResult> {
       removedIgnoredFolders,
       ref,
       skipped: true,
-      storedReleaseTag
+      storedReleaseTag,
     };
   }
 
   const clonePath = await fs.mkdtemp(
-    path.join(os.tmpdir(), "salesforce-skills-")
+    path.join(os.tmpdir(), "salesforce-skills-"),
   );
 
   try {
@@ -464,23 +486,19 @@ async function importSkills(): Promise<ImportResult> {
 
     const existingFolders = await listTopLevelDirectories(TARGET_PATH);
     const addedFolders = [...sourceFolders].filter(
-      (folder) => !existingFolders.has(folder)
+      (folder) => !existingFolders.has(folder),
     );
     const changedFolders = new Set([
-      ...(
-        await listChangedTopLevelDirectories(
-          sourcePath,
-          TARGET_PATH,
-          ignoredSkills
-        )
-      ),
-      ...(
-        await listRemovedTopLevelDirectories(
-          sourcePath,
-          TARGET_PATH,
-          ignoredSkills
-        )
-      )
+      ...(await listChangedTopLevelDirectories(
+        sourcePath,
+        TARGET_PATH,
+        ignoredSkills,
+      )),
+      ...(await listRemovedTopLevelDirectories(
+        sourcePath,
+        TARGET_PATH,
+        ignoredSkills,
+      )),
     ]);
     const changedExistingFolders = [...changedFolders]
       .filter((folder) => !addedFolders.includes(folder))
@@ -492,7 +510,7 @@ async function importSkills(): Promise<ImportResult> {
       await writeSkillsConfig({
         ...skillsConfig,
         installedVersion: ref,
-        ignoreSkills: skillsConfig.ignoreSkills ?? []
+        ignoreSkills: skillsConfig.ignoreSkills ?? [],
       });
     }
 
@@ -502,7 +520,7 @@ async function importSkills(): Promise<ImportResult> {
       removedIgnoredFolders,
       ref,
       skipped: false,
-      storedReleaseTag
+      storedReleaseTag,
     };
   } finally {
     await fs.rm(clonePath, { force: true, recursive: true });
@@ -516,7 +534,7 @@ try {
     ref,
     removedIgnoredFolders,
     skipped,
-    storedReleaseTag
+    storedReleaseTag,
   } = await importSkills();
 
   if (removedIgnoredFolders.length > 0) {
@@ -533,7 +551,7 @@ try {
     process.exit(0);
   } else {
     console.log(
-      `\n${GREEN}Updating skills from version ${storedReleaseTag} to ${ref}.${RESET}`
+      `\n${GREEN}Updating skills from version ${storedReleaseTag} to ${ref}.${RESET}`,
     );
   }
 

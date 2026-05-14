@@ -18,6 +18,15 @@ The script is useful to make sure you comply with Salesforce's guidelines as the
 npm run upsert:salesforce-skills
 ```
 
+## Configuration
+
+The script reads `scripts/salesforce-skills/salesforce-skills-config.jsonc`.
+
+Supported options:
+
+- `installedVersion`: records the imported Salesforce skills release tag.
+- `ignoreSkills`: excludes Salesforce skill folders by name.
+
 ## Intended audience
 
 This script is intended for Salesforce administrators, developers, and operations teams who are familiar with the Salesforce data model and need to automate Salesforce development or admin tasks.

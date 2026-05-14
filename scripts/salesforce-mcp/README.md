@@ -5,7 +5,7 @@ This script keeps local editor configuration in sync with the Salesforce Model C
 At a high level, the script:
 
 - updates the local `@salesforce/mcp` dependency with npm;
-- reads `scripts/salesforce-mcp/vibes-mcp-to-editor.json` for telemetry, usage of none-GA tools and filtering preferences;
+- reads `scripts/salesforce-mcp/vibes-mcp-to-editor.jsonc` for telemetry, usage of none-GA tools and filtering preferences;
 - builds an editor MCP server configuration for Salesforce tools;
 - writes or updates the MCP server configuration files using [Salesforce's MCP documentation](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_mcp_get_started.htm) in editor-specific settings:
   - `.vscode/mcp.json` for VS Code.
@@ -26,7 +26,7 @@ The command may update `package.json` and `package-lock.json` because it runs an
 
 ## Configuration
 
-The script reads `scripts/salesforce-mcp/vibes-mcp-to-editor.json`.
+The script reads `scripts/salesforce-mcp/vibes-mcp-to-editor.jsonc`.
 
 Supported options:
 

@@ -60,6 +60,25 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
 }
 
+function stripJsonComments(content: string): string {
+  return content
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s*\/\/.*$/gm, "")
+    .trim();
+}
+
+function stripJsonTrailingCommas(content: string): string {
+  return content.replace(/,\s*([}\]])/g, "$1");
+}
+
+function readJsonConfigFile<T>(filePath: string, defaultValue: T): T {
+  const content = stripJsonTrailingCommas(
+    stripJsonComments(fs.readFileSync(filePath, "utf8")),
+  );
+
+  return content ? (JSON.parse(content) as T) : defaultValue;
+}
+
 function readSalesforceMcpPackageState(): SalesforceMcpPackageState {
   const packageJsonPath = path.join(process.cwd(), "package.json");
   const packageLockPath = path.join(process.cwd(), "package-lock.json");
@@ -154,9 +173,9 @@ function readSyncConfig(): {
     process.cwd(),
     "scripts",
     "salesforce-mcp",
-    "vibes-mcp-to-editor.json",
+    "vibes-mcp-to-editor.jsonc",
   );
-  const config = readJsonFile<SyncConfig>(configPath);
+  const config = readJsonConfigFile<SyncConfig>(configPath, {});
   const sendTelemetry = config.sendTelemetry ?? true;
   const useNoneGATools = config.useNoneGATools ?? false;
   const ignoreToolsets = config.ignoreToolsets ?? [];
@@ -164,25 +183,25 @@ function readSyncConfig(): {
 
   if (typeof sendTelemetry !== "boolean") {
     throw new Error(
-      "scripts/salesforce-mcp/vibes-mcp-to-editor.json sendTelemetry must be a boolean",
+      "scripts/salesforce-mcp/vibes-mcp-to-editor.jsonc sendTelemetry must be a boolean",
     );
   }
 
   if (typeof useNoneGATools !== "boolean") {
     throw new Error(
-      "scripts/salesforce-mcp/vibes-mcp-to-editor.json useNoneGATools must be a boolean",
+      "scripts/salesforce-mcp/vibes-mcp-to-editor.jsonc useNoneGATools must be a boolean",
     );
   }
 
   if (!Array.isArray(ignoreToolsets)) {
     throw new Error(
-      "scripts/salesforce-mcp/vibes-mcp-to-editor.json ignoreToolsets must be an array",
+      "scripts/salesforce-mcp/vibes-mcp-to-editor.jsonc ignoreToolsets must be an array",
     );
   }
 
   if (!Array.isArray(ignoreTools)) {
     throw new Error(
-      "scripts/salesforce-mcp/vibes-mcp-to-editor.json ignoreTools must be an array",
+      "scripts/salesforce-mcp/vibes-mcp-to-editor.jsonc ignoreTools must be an array",
     );
   }
 

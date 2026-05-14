@@ -17,3 +17,14 @@
   ]
 }
 */
+{
+  "sendTelemetry": false,
+  "useNoneGATools": true,
+  "ignoreToolsets": ["devops"],
+  "ignoreTools": [
+    "deploy_metadata",
+    "create_org_snapshot",
+    "create_scratch_org",
+    "delete_org",
+  ],
+}
