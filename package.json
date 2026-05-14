@@ -11,30 +11,31 @@
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
-    "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
-    "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prettier": "prettier --write \"**/*.{cjs,cls,cmp,component,css,html,js,json,jsonc,md,page,trigger,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check \"**/*.{cjs,cls,cmp,component,css,html,js,json,jsonc,md,page,trigger,xml,yaml,yml}\"",
+    "update:sf": "npm update --global --audit=false --fund=false && sf plugins update && npm update --save --fund=false --audit=false",
     "upsert:salesforce-mcp": "node scripts/salesforce-mcp/sfdx_mcp_to_vscode.ts",
     "upsert:salesforce-skills": "node scripts/salesforce-skills/import-salesforce-skills.ts"
   },
   "devDependencies": {
-    "@lwc/eslint-plugin-lwc": "^3.1.0",
-    "@prettier/plugin-xml": "^3.4.1",
-    "@salesforce/eslint-config-lwc": "^4.0.0",
+    "@lwc/eslint-plugin-lwc": "^3.5.0",
+    "@prettier/plugin-xml": "^3.4.2",
+    "@salesforce/eslint-config-lwc": "^4.1.2",
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
     "@salesforce/mcp": "^0.30.9",
     "@salesforce/sfdx-lwc-jest": "^7.1.2",
-    "@types/node": "^25.6.0",
-    "eslint": "^9.29.0",
-    "eslint-plugin-import": "^2.31.0",
+    "@types/node": "^25.8.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest": "^28.14.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.1.2",
-    "prettier": "^3.5.3",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.3",
     "prettier-plugin-apex": "^2.2.6"
   },
   "lint-staged": {
-    "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
+    "**/*.{cjs,cls,cmp,component,css,html,js,json,jsonc,md,page,trigger,xml,yaml,yml}": [
       "prettier --write"
     ],
     "**/{aura,lwc}/**/*.js": [
