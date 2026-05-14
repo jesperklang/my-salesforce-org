@@ -1,9 +1,80 @@
 {
+  // General Settings
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
     "**/.sf": true,
     "**/.sfdx": true
   },
-  "xml.preferences.showSchemaDocumentationType": "none"
+
+  // General Salesforce Settings
+  "files.associations": {
+    "*.apex": "apex-anon",
+  },
+
+  // Editor Settings
+  "editor.detectIndentation": true,
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+
+  // Git Settings
+  "git.allowForcePush": false,
+  "git.autofetch": true,
+  "git.branchPrefix": "feature/",
+  
+  // Salesforce Extensions
+  "salesforcedx-vscode-lwc.preview.typeScriptSupport": true,
+  "salesforcedx-vscode-core.telemetry.enabled": false,
+  "salesforce.einsteinForDevelopers.enable": false,
+
+  // Other Extensions
+  "vsCodeSfdxHardis.colorUpdateLocation": "User",
+  "vsCodeSfdxHardis.lang": "auto",
+  "vsCodeSfdxHardis.theme.colorTheme": "auto",
+  "vsCodeSfdxHardis.theme.menuIconType": "vscode",
+
+  "todo-tree.general.showActivityBarBadge": true,
+  "todo-tree.general.statusBar": "current file",
+  "todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO"],
+  "todo-tree.tree.expanded": true,
+
+  // GitHub Copilot Settings
+  
+  "chat.tools.terminal.autoApprove": {
+    "pwd": true,
+    "ls": true,
+    "ls -la": true,
+    "command -v": true,
+    "which": true,
+    "rg": true,
+    "rg --files": true,
+    "git status": true,
+    "git status --short": true,
+    "git diff": true,
+    "git --no-pager diff": true,
+    "git log": true,
+    "git show": true,
+    "git --version": true,
+    "node --version": true,
+    "npm --version": true,
+    "sf --version": true,
+    "npx eslint": true,
+    "npx jest": true,
+  },
 }
