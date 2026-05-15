@@ -46,6 +46,8 @@ type SkillsConfig = {
   [key: string]: unknown;
 };
 
+type SkillIgnoreMatcher = (folder: string) => boolean;
+
 function hasErrorCode(error: unknown, code: string): boolean {
   return error instanceof Error && "code" in error && error.code === code;
 }
@@ -59,6 +61,26 @@ function stripJsonComments(content: string): string {
 
 function stripJsonTrailingCommas(content: string): string {
   return content.replace(/,\s*([}\]])/g, "$1");
+}
+
+function escapeRegExp(content: string): string {
+  return content.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function createSkillIgnoreMatcher(ignoreSkills: string[]): SkillIgnoreMatcher {
+  const exactMatches = new Set(
+    ignoreSkills.filter((skill) => !skill.includes("*")),
+  );
+  const wildcardPatterns = ignoreSkills
+    .filter((skill) => skill.includes("*"))
+    .map(
+      (skill) =>
+        new RegExp(`^${skill.split("*").map(escapeRegExp).join(".*")}$`),
+    );
+
+  return (folder) =>
+    exactMatches.has(folder) ||
+    wildcardPatterns.some((pattern) => pattern.test(folder));
 }
 
 function run(
@@ -195,7 +217,7 @@ async function readSkillsConfig(): Promise<SkillsConfig> {
       )
     ) {
       throw new Error(
-        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills values must be top-level folder names.`,
+        `${path.relative(process.cwd(), CONFIG_PATH)} ignoreSkills values must be top-level folder names or wildcard patterns.`,
       );
     }
 
@@ -218,35 +240,39 @@ async function writeSkillsConfig(config: SkillsConfig): Promise<void> {
 }
 
 async function removeIgnoredSkillFolders(
-  ignoredSkills: Set<string>,
+  isIgnoredSkill: SkillIgnoreMatcher,
 ): Promise<string[]> {
   const removedFolders: string[] = [];
   const removals: Promise<string | null>[] = [];
+  const existingFolders = await listTopLevelDirectories(TARGET_PATH);
 
-  [...ignoredSkills].sort().forEach((folder) => {
-    const folderPath = path.join(TARGET_PATH, folder);
+  [...existingFolders]
+    .filter(isIgnoredSkill)
+    .sort()
+    .forEach((folder) => {
+      const folderPath = path.join(TARGET_PATH, folder);
 
-    removals.push(
-      (async () => {
-        try {
-          const stats = await fs.stat(folderPath);
+      removals.push(
+        (async () => {
+          try {
+            const stats = await fs.stat(folderPath);
 
-          if (!stats.isDirectory()) {
-            return null;
+            if (!stats.isDirectory()) {
+              return null;
+            }
+
+            await fs.rm(folderPath, { force: true, recursive: true });
+            return folder;
+          } catch (error) {
+            if (hasErrorCode(error, "ENOENT")) {
+              return null;
+            }
+
+            throw error;
           }
-
-          await fs.rm(folderPath, { force: true, recursive: true });
-          return folder;
-        } catch (error) {
-          if (hasErrorCode(error, "ENOENT")) {
-            return null;
-          }
-
-          throw error;
-        }
-      })(),
-    );
-  });
+        })(),
+      );
+    });
 
   const removed = await Promise.all(removals);
   removed.forEach((folder) => {
@@ -302,7 +328,7 @@ async function hasSameContents(
 async function listChangedTopLevelDirectories(
   sourcePath: string,
   targetPath: string,
-  ignoredSkills: Set<string>,
+  isIgnoredSkill: SkillIgnoreMatcher,
   relativePath = "",
 ): Promise<Set<string>> {
   const entries = await fs.readdir(path.join(sourcePath, relativePath), {
@@ -315,7 +341,7 @@ async function listChangedTopLevelDirectories(
       const entryRelativePath = path.join(relativePath, entry.name);
       const topLevelFolder = entryRelativePath.split(path.sep)[0];
 
-      if (ignoredSkills.has(topLevelFolder)) {
+      if (isIgnoredSkill(topLevelFolder)) {
         return;
       }
 
@@ -323,7 +349,7 @@ async function listChangedTopLevelDirectories(
         const nestedChangedFolders = await listChangedTopLevelDirectories(
           sourcePath,
           targetPath,
-          ignoredSkills,
+          isIgnoredSkill,
           entryRelativePath,
         );
 
@@ -354,7 +380,7 @@ async function listChangedTopLevelDirectories(
 async function listRemovedTopLevelDirectories(
   sourcePath: string,
   targetPath: string,
-  ignoredSkills: Set<string>,
+  isIgnoredSkill: SkillIgnoreMatcher,
   relativePath = "",
 ): Promise<Set<string>> {
   let entries;
@@ -378,7 +404,7 @@ async function listRemovedTopLevelDirectories(
       const entryRelativePath = path.join(relativePath, entry.name);
       const topLevelFolder = entryRelativePath.split(path.sep)[0];
 
-      if (ignoredSkills.has(topLevelFolder)) {
+      if (isIgnoredSkill(topLevelFolder)) {
         return;
       }
 
@@ -405,7 +431,7 @@ async function listRemovedTopLevelDirectories(
       const nestedRemovedFolders = await listRemovedTopLevelDirectories(
         sourcePath,
         targetPath,
-        ignoredSkills,
+        isIgnoredSkill,
         entryRelativePath,
       );
 
@@ -457,8 +483,10 @@ async function cloneSkillsRepository(
 async function importSkills(): Promise<ImportResult> {
   const skillsConfig = await readSkillsConfig();
   const storedReleaseTag = skillsConfig.installedVersion;
-  const ignoredSkills = new Set(skillsConfig.ignoreSkills ?? []);
-  const removedIgnoredFolders = await removeIgnoredSkillFolders(ignoredSkills);
+  const isIgnoredSkill = createSkillIgnoreMatcher(
+    skillsConfig.ignoreSkills ?? [],
+  );
+  const removedIgnoredFolders = await removeIgnoredSkillFolders(isIgnoredSkill);
   const ref = REF ?? (await resolveLatestReleaseTag());
 
   if (!REF && storedReleaseTag === ref) {
@@ -481,7 +509,7 @@ async function importSkills(): Promise<ImportResult> {
 
     const sourcePath = path.join(clonePath, SOURCE_PATH);
     const sourceFolders = [...(await listTopLevelDirectories(sourcePath))]
-      .filter((folder) => !ignoredSkills.has(folder))
+      .filter((folder) => !isIgnoredSkill(folder))
       .sort();
 
     const existingFolders = await listTopLevelDirectories(TARGET_PATH);
@@ -492,12 +520,12 @@ async function importSkills(): Promise<ImportResult> {
       ...(await listChangedTopLevelDirectories(
         sourcePath,
         TARGET_PATH,
-        ignoredSkills,
+        isIgnoredSkill,
       )),
       ...(await listRemovedTopLevelDirectories(
         sourcePath,
         TARGET_PATH,
-        ignoredSkills,
+        isIgnoredSkill,
       )),
     ]);
     const changedExistingFolders = [...changedFolders]

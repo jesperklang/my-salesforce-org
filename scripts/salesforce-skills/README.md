@@ -25,7 +25,7 @@ The script reads `scripts/salesforce-skills/salesforce-skills-config.jsonc`.
 Supported options:
 
 - `installedVersion`: records the imported Salesforce skills release tag.
-- `ignoreSkills`: excludes Salesforce skill folders by name.
+- `ignoreSkills`: excludes Salesforce skill folders by name. Use `*` as a wildcard within a folder name, for example `*omnistudio*` excludes every skill folder whose name contains `omnistudio`.
 
 ## Intended audience
 

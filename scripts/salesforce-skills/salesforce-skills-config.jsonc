@@ -1,10 +1,18 @@
 /*
  * This file is used to configure the Salesforce Skills script.
  * It allows you to specify which skills to ignore when importing skills into VS Code.
+ * Wildcards are supported, so you can ignore multiple skills that share a common string e.g. "*datacloud*".
  * For more information, see the README in the scripts/salesforce-skills folder.
  */
 
 {
-    "installedVersion": "1.7.5",
-    "ignoreSkills": []
+  "installedVersion": "1.9.0",
+  "ignoreSkills": [
+    "*b2b-commerce*",
+    "*agentforce*",
+    "*datacloud*",
+    "*omnistudio*",
+    "generating-custom-lightning-type",
+    "searching-media"
+  ]
 }
