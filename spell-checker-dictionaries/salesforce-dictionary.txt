@@ -1,4 +1,5 @@
 # A dictionary for Salesforce related words:
+
 Agentforce
 Appy
 Batchable
@@ -42,3 +43,4 @@ Trailhead
 undelete
 utilitybar
 Visualforce
+omnistudio
