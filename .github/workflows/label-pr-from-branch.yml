@@ -1,0 +1,43 @@
+name: Label pull request from branch
+run-name: Label pull request #${{ github.event.pull_request.number || inputs.pr-number }}
+
+on:
+  pull_request:
+    types: [opened]
+  # Lets other workflows trigger labeling, since pull requests created with GITHUB_TOKEN don't fire pull_request events.
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: Pull request number
+        required: true
+        type: number
+
+permissions:
+  pull-requests: write
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add label matching the branch prefix
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr-number }}
+        run: |
+          branch="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq .head.ref)"
+
+          if [[ "$branch" != */* ]]; then
+            echo "Branch '$branch' has no '/' prefix. No label added."
+            exit 0
+          fi
+
+          label="${branch%%/*}"
+          encoded_label="$(jq -rn --arg label "$label" '$label | @uri')"
+
+          if ! gh api "repos/$GITHUB_REPOSITORY/labels/$encoded_label" --silent 2> /dev/null; then
+            echo "::notice::No label named '$label' exists. No label added."
+            exit 0
+          fi
+
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels" --method POST --field "labels[]=$label" --silent
+          echo "Added label '$label' to pull request #$PR_NUMBER."
