@@ -1,13 +1,100 @@
 {
   "orgName": "Demo company",
   "edition": "Developer",
-  "features": ["EnableSetPasswordInApi"],
+  "release": "preview",
+  "hasSampleData": true,
+  "features": [
+    // Sales
+    "SalesUser",
+    "LightningSalesConsole",
+    // Service
+    "ServiceCloud",
+    "ServiceUser",
+    "LightningServiceConsole",
+    "Entitlements",
+    "Knowledge",
+    "LiveAgent",
+    // Cross-Cloud Features
+    "MarketingUser",
+    "PersonAccounts",
+    "ContactsToMultipleAccounts",
+    "RecordTypes",
+    "Macros",
+    "Einstein1AIPlatform",
+    // Platform Features
+    "PlatformCache",
+    "ProcessBuilder",
+    "StreamingAPI",
+    "Workflow",
+    "Interaction", // (Flows)
+    // "AgentforceVibesIDEForDE",
+    "ApexGuruCodeAnalyzer",
+    "BigObjectsBulkAPI",
+    "ChangeDataCapture",
+    "DebugApex",
+    "CascadeDelete",
+    "CustomNotificationType"
+  ],
   "settings": {
+    "accountSettings": {
+      "enableAccountHistoryTracking": true,
+      "enableAccountTeams": true,
+      "enableRelateContactToMultipleAccounts": true
+    },
+    "caseSettings": {
+      "enableCaseFeed": true,
+      "enableDraftEmails": true,
+      "enhancedCaseMerge": true,
+      "emailToCaseSettings": {
+        "enableEmailToCase": true,
+        "enableHtmlEmail": true,
+        "enableNewToReadTriggers": true,
+        "enableThreadIDInBody": true,
+        "enableThreadTokenInBody": true
+      }
+    },
+    "opportunitySettings": {
+      "enableOpportunityTeam": true
+    },
+    "productSettings": {
+      "enableRevenueSchedule": true
+    },
+    "chatterSettings": {
+      "enableChatter": true,
+      "enableChatterEmoticons": true,
+      "enableFeedsRichText": true,
+      "enableRichLinkPreviewsInFeed": true
+    },
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true
     },
     "mobileSettings": {
       "enableS1EncryptedStoragePref2": false
+    },
+    "securitySettings": {
+      "enableAdminLoginAsAnyUser": true,
+      "enableAuditFieldsInactiveOwner": true
+    },
+    "emailAdministrationSettings": {
+      "enableEnhancedEmailEnabled": true
+    },
+    "enhancedNotesSettings": {
+      "enableEnhancedNotes": true
+    },
+    "flowSettings": {
+      "canDebugFlowAsAnotherUser": true
+    },
+    "userInterfaceSettings": {
+      "enableSldsV2DarkModeInCosmos": true,
+      "listViewIleBypassLayout": true,
+      "listViewIleMultiRecordType": true
+    },
+    "userManagementSettings": {
+      "enableEnhancedPermsetMgmt": true,
+      "enableEnhancedProfileMgmt": true,
+      "enableNewProfileUI": true,
+      "permsetsInFieldCreation": true,
+      "userFieldHistoryTracking": true
     }
   }
 }

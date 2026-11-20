@@ -1,25 +1,31 @@
 {
   // General Settings
+  "search.followSymlinks": false,
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
     "**/.sf": true,
     "**/.sfdx": true,
-    "**/coverage": true
+    "**/coverage": true,
+    "**/hardis-report": true,
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/bower_components/**": true,
+    "**/.sf/**": true,
+    "**/.sfdx/**": true,
+    "**/coverage/**": true,
+    "**/hardis-report/**": true,
   },
   "xml.preferences.showSchemaDocumentationType": "none",
+  "extensions.ignoreRecommendations": true,
 
   // Editor Settings
   "editor.detectIndentation": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-  // Task Settings
-  "task.allowAutomaticTasks": "on",
-
   // Telemetry Settings
   "telemetry.feedback.enabled": false,
-  "telemetry.editStats.details.enabled": false,
-  "telemetry.editStats.enabled": false,
   "salesforcedx-vscode-core.telemetry.enabled": false,
   "redhat.telemetry.enabled": false,
 
@@ -31,59 +37,31 @@
 
   // LLM Settings
   "chat.tools.urls.autoApprove": {
-    // VS Code URLs
-    "https://code.visualstudio.com/docs/*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    "https://code.visualstudio.com/api/*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    // Salesforce URLs
-    "https://developer.salesforce.com*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    "https://help.salesforce.com*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    "https://architect.salesforce.com*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    "https://admin.salesforce.com*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    "https://lightningdesignsystem.com*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    },
-    "https://v1.lightningdesignsystem.com*": {
-      "approveRequest": true,
-      "approveResponse": true,
-    }
+    // Auto-approve Salesforce URLs
+    "https://developer.salesforce.com/docs/*": true,
+    "https://help.salesforce.com/*": true,
+    "https://architect.salesforce.com/*": true,
+    "https://admin.salesforce.com/*": true,
+    "https://lightningdesignsystem.com/*": true,
+    "https://v1.lightningdesignsystem.com/*": true,
+    "https://developer.salesforce.com/docs/atlas.en-us.*": true
   },
 
   // Salesforce Settings
+  "salesforcedx-vscode-apex.autoTerminateOrphanedProcesses": true,
   "files.associations": {
     "*.apex": "apex-anon",
   },
-  "salesforcedx-vscode-lwc.preview.typeScriptSupport": true,
-  "salesforcedx-vscode-metadata.sourceTracking.enableConflictDetection": false,
 
-  // Hardis Settings
+  // Other Extension Settings
+  "cSpell.spellCheckOnlyWorkspaceFiles": true,
   "vsCodeSfdxHardis.colorUpdateLocation": "User",
-  "vsCodeSfdxHardis.theme.colorTheme": "auto",
   "vsCodeSfdxHardis.theme.menuIconType": "vscode",
-
-  // Better Todo Tree Settings
   "better-todo-tree.general.showActivityBarBadge": true,
   "better-todo-tree.general.statusBar": "current file",
   "better-todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO"],
   "better-todo-tree.tree.expanded": true,
   "better-todo-tree.filtering.includeHiddenFiles": true,
-  "chat.useNestedAgentsMdFiles": true,
+  "better-todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
+
 }

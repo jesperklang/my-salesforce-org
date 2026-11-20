@@ -29,5 +29,8 @@
     "cspell.json",
     "node_modules",
     "package-lock.json"
-  ]
+  ],
+  "cache": {
+    "useCache": true
+  }
 }

@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "strict": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true
   },
-  "include": ["scripts/**/*.ts"]
+  "include": ["scripts/**/*.ts", "spell-checker-dictionaries/*.ts"]
 }

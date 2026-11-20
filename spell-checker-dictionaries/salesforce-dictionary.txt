@@ -1,46 +1,61 @@
-# A dictionary for Salesforce related words:
+A dictionary for Salesforce related words
 
-Agentforce
-Appy
-Batchable
+** Salesforce products & ?? **
+sfdc
+agentforce
+trailhead
+pardot
+omnistudio
+itsm
+
+** Salesforce Objects **
+olis
+opps
+pricebook
+pricebooks
+
+** Formula functions **
 BLANKVALUE
-Codey
 DATETIMEVALUE
 DATEVALUE
-flexipage
 GEOLOCATION
-helptext
-Hootie
 ISBLANK
 ISCHANGED
 ISNEW
 ISNULL
 ISPICKVAL
 LPAD
-olis
-onrefresh
-onvalidated
-opps
-Pardot
-Picklist
-Pricebook
-pricebooks
 PRIORVALUE
-Queueable
-queueables
+TIMEVALUE
 RPAD
+
+** Admin & Developer words **
 salesforcedx
-Schedulable
 sfdx
 slds
+visualforce
+changeevent
+batchable
+queueable
+queueables
+schedulable
 sObject
 SOQL
 SOSL
-subflows
-tabset
-TIMEVALUE
-Trailhead
 undelete
+datamask
+picklist
+subflows
 utilitybar
-Visualforce
-omnistudio
+hardis
+
+** Salesforce Lightning Components **
+uiapi
+datatable
+flexipage
+helptext
+onloadmore
+onrefresh
+onrowaction
+onvalidated
+tabset
