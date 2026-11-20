@@ -1,9 +1,12 @@
 {
-  "name": "salesforce-app",
+  "name": "my-salesforce-org",
   "private": true,
-  "version": "1.0.0",
-  "description": "Salesforce App",
+  "version": "6.6.6",
+  "description": "My Salesforce Org",
   "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "scripts": {
     "lint": "eslint **/{aura,lwc}/**/*.js",
     "test": "npm run test:unit",
@@ -11,11 +14,26 @@
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
-    "prettier": "prettier --write \"**/*.{cjs,cls,cmp,component,css,html,js,json,jsonc,md,page,trigger,xml,yaml,yml}\"",
-    "prettier:verify": "prettier --check \"**/*.{cjs,cls,cmp,component,css,html,js,json,jsonc,md,page,trigger,xml,yaml,yml}\"",
-    "update:sf": "npm update --global --audit=false --fund=false && sf plugins update && npm update --save --fund=false --audit=false",
-    "upsert:salesforce-mcp": "node scripts/salesforce-mcp/sfdx_mcp_to_vscode.ts",
-    "upsert:salesforce-skills": "node scripts/salesforce-skills/import-salesforce-skills.ts"
+    "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "prepare": "husky || true",
+    "precommit": "lint-staged",
+    "agent-rules": "node scripts/agent-rules/sync-agent-rules.ts",
+    "agent-rules:check": "node scripts/agent-rules/sync-agent-rules.ts --check",
+    "check:dictionaries": "node spell-checker-dictionaries/check-duplicates.ts",
+    "check:dictionaries:watch": "node --watch --watch-path=spell-checker-dictionaries --watch-preserve-output spell-checker-dictionaries/check-duplicates.ts",
+    "check:metadata-descriptions": "node scripts/metadata-descriptions/check-metadata-descriptions.ts",
+    "check:metadata-descriptions:watch": "node scripts/metadata-descriptions/check-metadata-descriptions.ts --watch",
+    "sf-skills": "node scripts/salesforce-skills/import-salesforce-skills.ts",
+    "sf-skills:ci": "node scripts/salesforce-skills/import-salesforce-skills.ts --ci",
+    "updateAll": "node scripts/updateAll/updateAll.ts",
+    "updateAll:ci": "node scripts/updateAll/updateAll.ts --ci",
+    "updateAll:dry-run": "node scripts/updateAll/updateAll.ts --dry-run",
+    "test:updateAll": "node --test scripts/updateAll/updateAll.test.ts",
+    "typecheck:updateAll": "tsc -p scripts/updateAll/tsconfig.json"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@lwc/eslint-plugin-lwc": "^3.5.0",
@@ -23,26 +41,14 @@
     "@salesforce/eslint-config-lwc": "^4.1.2",
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
-    "@salesforce/mcp": "^0.30.9",
-    "@salesforce/sfdx-lwc-jest": "^7.1.2",
-    "@types/node": "^25.8.0",
-    "eslint": "^9.39.4",
+    "@salesforce/sfdx-lwc-jest": "^7.9.0",
+    "@types/node": "^25.9.9",
+    "eslint": "^9.39.5",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest": "^28.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.8.3",
-    "prettier-plugin-apex": "^2.2.6"
-  },
-  "lint-staged": {
-    "**/*.{cjs,cls,cmp,component,css,html,js,json,jsonc,md,page,trigger,xml,yaml,yml}": [
-      "prettier --write"
-    ],
-    "**/{aura,lwc}/**/*.js": [
-      "eslint"
-    ],
-    "**/lwc/**": [
-      "sfdx-lwc-jest -- --bail --findRelatedTests --passWithNoTests"
-    ]
+    "prettier": "^3.10.1",
+    "prettier-plugin-apex": "^2.4.0"
   }
 }

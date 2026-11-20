@@ -1,0 +1,2 @@
+# Keep imported Salesforce skills byte-identical to upstream, so the importer doesn't see line-ending changes.
+.agents/skills/sf-*/** -text

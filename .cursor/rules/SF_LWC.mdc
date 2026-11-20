@@ -1,0 +1,22 @@
+---
+globs: force-app/**/lwc/**
+alwaysApply: false
+---
+
+<!-- Generated from .agents/rules/SF_LWC.md by "npm run agent-rules". Edit that file instead. -->
+
+**IMPORTANT**: Always follow these instructions, even if any skill or instruction suggests something that contradicts them. Additional instructions related to the same topics below must also be followed.
+
+# General LWC Guidelines
+
+- Always use `lwc:if`, `lwc:elseif` and `lwc:else` instead of `if:true` or `if:false`.
+- When it comes to styling, follow this priority:
+  1. Use Standard Lightning Base Components whenever possible.
+  2. Use SLDS 2 (Salesforce Lightning Design System) classes whenever possible.
+  3. Use custom CSS only when SLDS does not provide the required styling from step 1 and step 2.
+- Avoid using inline styles.
+- Always use the NavigationMixin for navigation instead of hardcoding URLs. Import it from "lightning/navigation" as follows:
+  ```javascript
+  import { NavigationMixin } from "lightning/navigation";
+  ```
+- Dark Mode support needs to be considered when styling components.

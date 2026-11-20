@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=./yaml-schemas/salesforce-skills-config.schema.json
+
+# This file configures the Salesforce Skills script.
+# It allows you to specify which skills to ignore and where to install and link them.
+# For more information, see the README in the scripts/salesforce-skills folder.
+
+# The skills get the "sf-" prefix to distinguish them from other skills
+# when installing, updating, deleting or linking them.
+
+ignoredSkills:
+  - sf-platform-datamask-run
+  - sf-commerce*
+  - sf-crm-analytics*
+  - sf-dx-devops*
+  - sf-data360*
+  - sf-omnistudio*
+  - sf-experience-cms*
+  - sf-*2gp*
+  - sf-*d360*
+  - sf-*tableau*
+  - sf-consumer-goods*
+  - sf-education-cloud*
+  - sf-field-service*
+  - sf-insurance*
+  - sf-life-sciences*
+  - sf-marketing*
+  - sf-nonprofit*
+  - sf-service-itsm*
+saveOptions:
+  source: .agents/skills/ # Codex, Cursor, Gemini
+  symlinks:
+    - .claude/skills/ # Claude
+    - .github/skills/ # GitHub Copilot, GitHub.com
+installedVersion:
+  version: "1.70.0"
+  released: "2026-11-13"

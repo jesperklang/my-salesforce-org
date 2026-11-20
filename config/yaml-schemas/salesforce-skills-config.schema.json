@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Salesforce Skills config",
+  "markdownDescription": "Configures the Salesforce Skills import script. See `scripts/salesforce-skills/README.md`.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ignoredSkills": {
+      "markdownDescription": "Salesforce skills to skip when installing, updating, deleting or linking.\n\nUse the **prefixed** skill name, e.g. `sf-platform-datamask-run`. Use `*` as a wildcard anywhere in the name, e.g. `sf-commerce*` or `sf-*d360*`. Quote patterns that begin with `*`.",
+      "type": "array",
+      "default": [],
+      "uniqueItems": true,
+      "items": {
+        "markdownDescription": "Prefixed skill name or wildcard pattern, e.g. `sf-omnistudio*`. Must not contain `/` or `\\`.",
+        "type": "string",
+        "pattern": "^(?!\\.\\.?$)[^/\\\\]+$"
+      }
+    },
+    "saveOptions": {
+      "markdownDescription": "Where skills are installed and linked. Paths are resolved from the workspace root; absolute paths also work.\n\nChanging these options doesn't clean up previous locations.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "markdownDescription": "Folder the skills are installed into (used by Codex, Cursor and Gemini).\n\nDefaults to `.agents/skills/`.",
+          "type": "string",
+          "minLength": 1,
+          "default": ".agents/skills/"
+        },
+        "symlinks": {
+          "markdownDescription": "Folders that get a link to each installed skill, e.g. `.claude/skills/` (Claude) or `.github/skills/` (GitHub Copilot).\n\nDefaults to `[\".claude/skills/\"]`; use `[]` to create no links. A folder can't be listed twice or match `source`.",
+          "type": "array",
+          "uniqueItems": true,
+          "default": [".claude/skills/"],
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "installedVersion": {
+      "markdownDescription": "The imported Salesforce skills release. **Updated by the script** - don't edit it by hand.",
+      "type": "object",
+      "required": ["version", "released"],
+      "properties": {
+        "version": {
+          "markdownDescription": "Installed Salesforce skills release version, e.g. `\"1.70.0\"`.",
+          "type": "string",
+          "minLength": 1
+        },
+        "released": {
+          "markdownDescription": "GitHub publication date of the release (`YYYY-MM-DD`, UTC).",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,120 @@
+name: Update Salesforce skills
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-salesforce-skills
+  cancel-in-progress: false
+
+env:
+  BASE_BRANCH: main
+  SKILLS_BRANCH: maintenance/skills
+
+jobs:
+  update-skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --omit=dev --ignore-scripts
+
+      - name: Prepare ${{ env.SKILLS_BRANCH }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git show-ref --verify --quiet "refs/remotes/origin/$SKILLS_BRANCH"; then
+            git switch -c "$SKILLS_BRANCH" "origin/$SKILLS_BRANCH"
+            if ! git merge --no-edit "origin/$BASE_BRANCH"; then
+              git merge --abort
+              echo "::error::Could not merge $BASE_BRANCH into $SKILLS_BRANCH because of conflicts. Resolve them manually and rerun the workflow."
+              exit 1
+            fi
+          else
+            git switch -c "$SKILLS_BRANCH"
+          fi
+
+      - name: Import Salesforce skills
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NO_COLOR: "1"
+        run: |
+          output_file="$RUNNER_TEMP/salesforce-skills-output.txt"
+          if ! npm run --silent sf-skills:ci > /dev/null 2> "$output_file"; then
+            cat "$output_file"
+            exit 1
+          fi
+          cat "$output_file"
+
+      - name: Commit changes
+        id: commit
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No Salesforce skill changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          version="$(node --input-type=module -e "import fs from 'node:fs'; import { parse } from 'yaml'; console.log(parse(fs.readFileSync('config/salesforce-skills-config.yaml', 'utf8'))?.installedVersion?.version ?? '')")"
+          title="Update Salesforce skills${version:+ to $version}"
+
+          git add -A
+          git commit -m "$title"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+
+      - name: Find open pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          number="$(gh pr list --head "$SKILLS_BRANCH" --base "$BASE_BRANCH" --state open --json number --jq '.[0].number // empty')"
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      # Also push when only main was merged in, so an open pull request stays up to date.
+      - name: Push ${{ env.SKILLS_BRANCH }}
+        if: steps.commit.outputs.changed == 'true' || steps.pr.outputs.number != ''
+        run: git push origin "HEAD:refs/heads/$SKILLS_BRANCH"
+
+      - name: Create or update pull request
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_TITLE: ${{ steps.commit.outputs.title }}
+        run: |
+          body_file="$RUNNER_TEMP/pull-request-body.md"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          section="$(printf '## Importer output (%s)\n\n[Workflow run](%s)\n\n```text\n%s\n```' "$(date -u +%F)" "$run_url" "$(cat "$RUNNER_TEMP/salesforce-skills-output.txt")")"
+
+          # Append to an existing pull request so earlier updates stay documented.
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr view "$PR_NUMBER" --json body --jq .body > "$body_file"
+            printf '\n\n%s\n' "$section" >> "$body_file"
+            gh pr edit "$PR_NUMBER" --title "$PR_TITLE" --body-file "$body_file"
+          else
+            {
+              printf 'Automated update of the imported Salesforce skills by the daily **%s** workflow.\n\n' "$GITHUB_WORKFLOW"
+              printf '%s\n' "$section"
+            } > "$body_file"
+            pr_url="$(gh pr create --base "$BASE_BRANCH" --head "$SKILLS_BRANCH" --title "$PR_TITLE" --body-file "$body_file")"
+            echo "$pr_url"
+            gh workflow run label-pr-from-branch.yml --ref "$BASE_BRANCH" -f pr-number="${pr_url##*/}"
+          fi
