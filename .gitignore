@@ -60,11 +60,15 @@ config/user/.sfdx-hardis.*.yml
 hardis-report
 
 # REPO SPECIFIC
-.claude/skills/sf-*
-.github/skills/sf-*
-force-app/main/
+TODO.md
+*.vsix
+
+**/skills/sf-*
+!.agents/skills
+
+force-app/*
+!force-app/scrollable-field/
+
 scripts/*
 !/scripts/salesforce-skills/
 !/scripts/agent-rules/
-TODO.md
-*.vsix
