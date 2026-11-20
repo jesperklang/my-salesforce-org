@@ -9,3 +9,6 @@
 .vscode
 
 coverage/
+
+# Imported Salesforce skills must stay identical to upstream
+.agents/skills/sf-*/
