@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Rules config",
+  "markdownDescription": "Configures the Agent Rules sync script. See `scripts/agent-rules/README.md`.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "markdownDescription": "Folder with the rules (the source of truth). Only edit the rules here; the copies are overwritten on every run.\n\nDefaults to `.agents/rules/`.",
+      "type": "string",
+      "minLength": 1,
+      "default": ".agents/rules/"
+    },
+    "targets": {
+      "markdownDescription": "Harnesses that get a copy of every rule.\n\nDefaults to Claude (`.claude/rules/`) and GitHub Copilot (`.github/instructions/`). Removing a target doesn't delete its existing copies.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["folder", "fileName"],
+        "properties": {
+          "folder": {
+            "markdownDescription": "Folder the copies are written to, e.g. `.claude/rules/`.",
+            "type": "string",
+            "minLength": 1
+          },
+          "fileName": {
+            "markdownDescription": "File name of each copy. `{name}` is the rule's file name without `.md`, e.g. `\"{name}.instructions.md\"`.\n\nMust contain `{name}` and end with `.md` or `.mdc`. Two targets can't write to the same file.",
+            "type": "string",
+            "pattern": "\\{name\\}.*\\.mdc?$"
+          },
+          "frontmatter": {
+            "markdownDescription": "Keys written to each copy's frontmatter, on top of the rule's own keys (except `paths`).\n\n- `$paths` writes the rule's paths as a YAML list.\n- `$pathsCsv` writes them as one comma-separated string.\n- Any other value is written as is.",
+            "type": "object",
+            "default": {},
+            "additionalProperties": {
+              "markdownDescription": "`$paths` (YAML list of the rule's paths), `$pathsCsv` (comma-separated string) or any literal value.",
+              "examples": ["$paths", "$pathsCsv"]
+            }
+          }
+        }
+      }
+    },
+    "indexFile": {
+      "markdownDescription": "Always-on instructions file that gets a generated index of the rules, for harnesses without rule folders (Codex). The index is written between the `<!-- agent-rules:start -->` and `<!-- agent-rules:end -->` markers.\n\nDefaults to `AGENTS.md`; set to `\"\"` to skip the index.",
+      "type": "string",
+      "default": "AGENTS.md"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=./yaml-schemas/agent-rules-config.schema.json
+
+# This file configures the Agent Rules script.
+# The rules in "source" are the source of truth. The script writes a copy of every
+# rule to each target, with the file name and frontmatter that harness expects.
+# For more information, see the README in the scripts/agent-rules folder.
+
+# Folder with the rules. Only edit the rules here.
+source: .agents/rules/
+
+# Harnesses that get a copy of every rule:
+targets:
+  - folder: .claude/rules/ # Claude
+    fileName: "{name}.md"
+    frontmatter:
+      paths: $paths
+
+  - folder: .github/instructions/ # GitHub Copilot
+    fileName: "{name}.instructions.md"
+    frontmatter:
+      applyTo: $pathsCsv
+
+  - folder: .cursor/rules/ # Cursor
+    fileName: "{name}.mdc"
+    frontmatter:
+      globs: $pathsCsv
+      alwaysApply: false
+
+# Always-on instructions file that gets a generated index of the rules,
+# for harnesses without rule folders (Codex). Set to "" to skip the index.
+indexFile: AGENTS.md
