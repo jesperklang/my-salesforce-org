@@ -1,0 +1,138 @@
+<template>
+  <lightning-card title="Data Factory Example" icon-name="standard:record">
+    <div class="slds-is-relative slds-var-p-horizontal_medium">
+      <template lwc:if={isBusy}>
+        <lightning-spinner
+          alternative-text={spinnerText}
+          size="small"
+        ></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p class="slds-text-color_error slds-var-m-bottom_small" role="alert">
+          {errorMessage}
+        </p>
+      </template>
+
+      <lightning-combobox
+        name="object"
+        label="Object"
+        placeholder="Select an Object"
+        options={objectOptions}
+        value={selectedObjectApiName}
+        onchange={handleObjectChange}
+        required
+      ></lightning-combobox>
+
+      <template lwc:if={selectedObjectApiName}>
+        <lightning-combobox
+          class="slds-var-m-top_small"
+          name="flavour"
+          label="Flavour"
+          placeholder="Select a Flavour"
+          options={flavourOptions}
+          value={selectedFlavour}
+          onchange={handleFlavourChange}
+          required
+        ></lightning-combobox>
+      </template>
+
+      <template lwc:if={selectedFlavour}>
+        <lightning-record-edit-form
+          object-api-name={selectedObjectApiName}
+          onsubmit={handleSubmit}
+        >
+          <template lwc:if={hasDefaultFields}>
+            <h3
+              class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small"
+            >
+              Data Factory Defaults
+            </h3>
+            <template lwc:if={hasOverriddenDefaults}>
+              <ul
+                class="slds-list_dotted slds-var-m-bottom_x-small slds-text-body_small slds-text-color_weak"
+              >
+                <template for:each={overriddenDefaults} for:item="override">
+                  <li key={override.apiName}>
+                    <strong>{override.label}:</strong> {override.fromValue}
+                    &rarr; {override.toValue}
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <lightning-layout multiple-rows>
+              <template for:each={defaultFields} for:item="field">
+                <lightning-layout-item
+                  key={field.key}
+                  size="12"
+                  medium-device-size="6"
+                  padding="horizontal-small"
+                >
+                  <lightning-input-field
+                    field-name={field.apiName}
+                    value={field.value}
+                  ></lightning-input-field>
+                </lightning-layout-item>
+              </template>
+            </lightning-layout>
+          </template>
+
+          <template lwc:if={hasFlavourFields}>
+            <h3
+              class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small"
+            >
+              Additional Flavour fields
+            </h3>
+            <lightning-layout multiple-rows>
+              <template for:each={flavourFields} for:item="field">
+                <lightning-layout-item
+                  key={field.key}
+                  size="12"
+                  medium-device-size="6"
+                  padding="horizontal-small"
+                >
+                  <lightning-input-field
+                    field-name={field.apiName}
+                    value={field.value}
+                  ></lightning-input-field>
+                </lightning-layout-item>
+              </template>
+            </lightning-layout>
+          </template>
+
+          <template lwc:if={hasAdditionalFields}>
+            <h3
+              class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small"
+            >
+              Additional fields
+            </h3>
+            <lightning-layout multiple-rows>
+              <template for:each={additionalFields} for:item="field">
+                <lightning-layout-item
+                  key={field.key}
+                  size="12"
+                  medium-device-size="6"
+                  padding="horizontal-small"
+                >
+                  <lightning-input-field
+                    field-name={field.apiName}
+                    value={field.value}
+                  ></lightning-input-field>
+                </lightning-layout-item>
+              </template>
+            </lightning-layout>
+          </template>
+        </lightning-record-edit-form>
+      </template>
+    </div>
+
+    <div slot="footer" class="slds-text-align_right">
+      <lightning-button
+        variant="brand"
+        label="Create"
+        onclick={handleCreate}
+        disabled={isCreateDisabled}
+      ></lightning-button>
+    </div>
+  </lightning-card>
+</template>
