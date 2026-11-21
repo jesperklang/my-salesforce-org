@@ -26,11 +26,13 @@ ignoredSkills:
   - sf-marketing*
   - sf-nonprofit*
   - sf-service-itsm*
+  - sf-industries*
+  - sf-agentforce*
 saveOptions:
   source: .agents/skills/ # Codex, Cursor, Gemini
   symlinks:
     - .claude/skills/ # Claude
     - .github/skills/ # GitHub Copilot, GitHub.com
 installedVersion:
-  version: "1.70.0"
-  released: "2026-11-13"
+  version: "1.71.0"
+  released: "2026-11-20"
