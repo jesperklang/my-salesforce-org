@@ -68,6 +68,7 @@ TODO.md
 
 force-app/*
 !force-app/scrollable-field/
+!force-app/data-factory/
 
 scripts/*
 !/scripts/salesforce-skills/
