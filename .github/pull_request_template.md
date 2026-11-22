@@ -1,9 +1,8 @@
-## Bug Pull Request Template
+## New feature
 
-### Describe the bug
-<!-- Please provide a clear and concise description of the bug. -->
-
-
-### Your fix
-<!-- Please list the issues or bugs that this pull request fixes. -->
+### Describe the feature
+<!-- Please provide a clear and concise description of the feature. -->
 *
+
+### Notes
+<!-- Please provide any additional notes or context for this feature. -->
