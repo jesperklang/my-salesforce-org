@@ -73,3 +73,4 @@ force-app/*
 scripts/*
 !/scripts/salesforce-skills/
 !/scripts/agent-rules/
+!/scripts/updateAll/
