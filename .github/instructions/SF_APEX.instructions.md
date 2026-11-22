@@ -49,6 +49,7 @@ applyTo: force-app/**/classes/**,force-app/**/triggers/**,scripts/**/*.apex
   ```
 
 - Never use `System.debug` in production code. Only use it if something doesn't work as expected during development or debugging.
+- When instantiating SObject records in Apex (production code, tests, or scripts), use `DataFactory` (`force-app/data-factory/apex/DataFactory.cls`) as the base and follow the `apex-data-factory` skill (`.agents/skills/apex-data-factory/SKILL.md`).
 - Always use ApexDoc comments for documenting classes and methods to ensure clear and maintainable code.
 
   Example:
