@@ -1,15 +1,19 @@
+# Daily workflow that runs `npm run updateAll:ci` and opens (or updates) a PR
+# on `maintenance/package-update` whenever npm package files change.
 name: Update npm packages
 
 on:
   schedule:
-    - cron: "0 5 * * *"
+    # Run daily at 18:00 UTC.
+    - cron: "0 18 * * *"
+  # Allow manual ad-hoc runs from the GitHub Actions tab.
   workflow_dispatch:
 
 permissions:
-  actions: write
   contents: write
   pull-requests: write
 
+# Prevent overlapping runs from racing on the same update branch.
 concurrency:
   group: update-npm-packages
   cancel-in-progress: false
@@ -22,6 +26,7 @@ jobs:
   update-packages:
     runs-on: ubuntu-latest
     steps:
+      # Full history is needed to inspect and merge the existing update branch.
       - uses: actions/checkout@v7
         with:
           ref: ${{ env.BASE_BRANCH }}
@@ -32,6 +37,7 @@ jobs:
           node-version: lts/*
           cache: npm
 
+      # Reuse the existing update branch (merging latest main into it) or create it from main.
       - name: Prepare ${{ env.UPDATE_BRANCH }}
         run: |
           git config user.name "github-actions[bot]"
@@ -48,13 +54,17 @@ jobs:
             git switch -c "$UPDATE_BRANCH"
           fi
 
+      # Install after switching branches so node_modules matches this branch's lockfile.
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      # Updates repo/bundle npm packages, sets step outputs (packages-changed,
+      # worst-severity-unresolved), and writes the Markdown report to summary.md.
       - name: Update npm packages
         id: update
         run: npm run updateAll:ci -- --output-dir="$RUNNER_TEMP/updateAll-output"
 
+      # Skip committing when no package files changed.
       - name: Commit changes
         id: commit
         env:
@@ -70,6 +80,7 @@ jobs:
           git commit -m "Update npm packages"
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
+      # Check whether an open PR already exists for the update branch.
       - name: Find open pull request
         id: pr
         env:
@@ -89,14 +100,40 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.pr.outputs.number }}
           PR_TITLE: Update npm packages
+          WORST_SEVERITY_UNRESOLVED: ${{ steps.update.outputs.worst-severity-unresolved }}
+          CRITICAL_MENTIONS: ${{ vars.CRITICAL_MENTIONS }}
         run: |
           body_file="$RUNNER_TEMP/pull-request-body.md"
           section_file="$RUNNER_TEMP/updateAll-section.md"
           summary_file="$RUNNER_TEMP/updateAll-output/summary.md"
           run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
 
+          # Severity scale from updateAll: 0=none, 1=info, 2=low, 3=moderate, 4=high, 5=critical.
+          has_critical=false
+          if [ "${WORST_SEVERITY_UNRESOLVED:-0}" -ge 5 ]; then
+            has_critical=true
+          fi
+
+          # Convert comma-separated usernames from CRITICAL_MENTIONS into "@user1 @user2".
+          mentions=""
+          if [ "$has_critical" = "true" ] && [ -n "$CRITICAL_MENTIONS" ]; then
+            IFS=',' read -ra raw_users <<< "$CRITICAL_MENTIONS"
+            for user in "${raw_users[@]}"; do
+              user="${user#"${user%%[![:space:]]*}"}"
+              user="${user%"${user##*[![:space:]]}"}"
+              user="${user#@}"
+              if [ -n "$user" ]; then
+                mentions="${mentions:+$mentions }@$user"
+              fi
+            done
+          fi
+
+          # Build this run's dated Markdown section (including a critical callout if needed).
           {
             printf '## Update output (%s)\n\n[Workflow run](%s)\n\n' "$(date -u +%F)" "$run_url"
+            if [ "$has_critical" = "true" ]; then
+              printf '> [!CAUTION]\n> Critical vulnerabilities could not be fixed automatically.%s\n\n' "${mentions:+ $mentions}"
+            fi
             cat "$summary_file"
           } > "$section_file"
 
@@ -105,13 +142,26 @@ jobs:
             gh pr view "$PR_NUMBER" --json body --jq .body > "$body_file"
             printf '\n\n' >> "$body_file"
             cat "$section_file" >> "$body_file"
-            gh pr edit "$PR_NUMBER" --title "$PR_TITLE" --body-file "$body_file"
+            edit_args=(--title "$PR_TITLE" --body-file "$body_file")
+            if [ "$has_critical" = "true" ]; then
+              edit_args+=(--add-label "critical")
+            fi
+            gh pr edit "$PR_NUMBER" "${edit_args[@]}"
           else
+            # Create a new pull request with the maintenance label (plus critical if unresolved).
             {
               printf 'Automated update of npm packages by the daily **%s** workflow.\n\n' "$GITHUB_WORKFLOW"
               cat "$section_file"
             } > "$body_file"
-            pr_url="$(gh pr create --base "$BASE_BRANCH" --head "$UPDATE_BRANCH" --title "$PR_TITLE" --body-file "$body_file")"
-            echo "$pr_url"
-            gh workflow run label-pr-from-branch.yml --ref "$BASE_BRANCH" -f pr-number="${pr_url##*/}"
+            create_args=(
+              --base "$BASE_BRANCH"
+              --head "$UPDATE_BRANCH"
+              --title "$PR_TITLE"
+              --body-file "$body_file"
+              --label "maintenance"
+            )
+            if [ "$has_critical" = "true" ]; then
+              create_args+=(--label "critical")
+            fi
+            gh pr create "${create_args[@]}"
           fi
