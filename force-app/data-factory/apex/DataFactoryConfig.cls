@@ -22,7 +22,7 @@ public with sharing class DataFactoryConfig {
     return new DataFactory.ObjectConfig()
       .withDefaults(
         new Map<Schema.SObjectField, Object>{
-          Account.Name => 'Default Account',
+          Account.Name => 'Default Account {0}',
           Account.Type => 'Prospect',
           Account.Industry => 'Technology'
         }
