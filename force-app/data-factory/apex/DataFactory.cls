@@ -1,6 +1,7 @@
 /**
  * Builds in-memory records with precedence: base defaults, flavour, caller values.
  * Caller values (including explicit nulls) are preserved without changing the input.
+ * String defaults, flavours, and caller-supplied values replace {0} with a transaction-wide, per-object sequence starting at 1.
  * No records are queried or saved.
  * @see DataFactoryConfig
  * @see DataFactoryController
@@ -12,6 +13,8 @@ public with sharing class DataFactory {
 
   @TestVisible
   private static Map<Schema.SObjectType, ObjectConfig> configByType;
+  private static final String SEQUENCE_PLACEHOLDER = '{0}';
+  private static final Map<Schema.SObjectType, Integer> SEQUENCE_BY_TYPE = new Map<Schema.SObjectType, Integer>();
 
   /**
    * Builds a record using its object's base defaults.
@@ -232,13 +235,34 @@ public with sharing class DataFactory {
     SObject record,
     Map<Schema.SObjectField, Object> values
   ) {
+    Schema.SObjectType objectType = record.getSObjectType();
+    Integer sequence = (SEQUENCE_BY_TYPE.get(objectType) ?? 0) + 1;
+    String sequenceText = String.valueOf(sequence);
     SObject result = record.clone(true, true, true, true);
+    Map<String, Object> populatedFields = record.getPopulatedFieldsAsMap();
+    for (String fieldName : populatedFields.keySet()) {
+      Object value = populatedFields.get(fieldName);
+      if (value instanceof String) {
+        String stringValue = (String) value;
+        if (stringValue.contains(SEQUENCE_PLACEHOLDER)) {
+          result.put(
+            fieldName,
+            stringValue.replace(SEQUENCE_PLACEHOLDER, sequenceText)
+          );
+        }
+      }
+    }
     for (Schema.SObjectField field : values.keySet()) {
       // isSet distinguishes an explicit null from a field the caller omitted.
       if (!record.isSet(field)) {
-        result.put(field, values.get(field));
+        Object value = values.get(field);
+        if (value instanceof String) {
+          value = ((String) value).replace(SEQUENCE_PLACEHOLDER, sequenceText);
+        }
+        result.put(field, value);
       }
     }
+    SEQUENCE_BY_TYPE.put(objectType, sequence);
     return result;
   }
 
@@ -295,7 +319,7 @@ public with sharing class DataFactory {
 
     /**
      * Adds base default field values for this object.
-     * @param values Field values keyed by Schema.SObjectField.
+     * @param values Field values keyed by Schema.SObjectField; strings may contain {0} for the per-object sequence.
      * @return This ObjectConfig for chaining.
      * @throws DataFactoryException If values is null.
      */
@@ -310,7 +334,7 @@ public with sharing class DataFactory {
     /**
      * Registers a named flavour whose values override the base defaults.
      * @param name Flavour display name; matched case-insensitively.
-     * @param values Field values keyed by Schema.SObjectField.
+     * @param values Field values keyed by Schema.SObjectField; strings may contain {0} for the per-object sequence.
      * @return This ObjectConfig for chaining.
      * @throws DataFactoryException If name is blank, reserved, contains ": ", or values is null.
      */

@@ -26,7 +26,7 @@ Each object's defaults and flavours are configured in [DataFactoryConfig](apex/D
 ```java
 Account.SObjectType => new DataFactory.ObjectConfig()
   .withDefaults(new Map<Schema.SObjectField, Object>{
-    Account.Name => 'Default Account',
+    Account.Name => 'Default Account {0}',
     Account.Type => 'Prospect',
     Account.Industry => 'Technology'
   })
@@ -57,6 +57,25 @@ List<SObject> mixedRecords = DataFactory.create(
   new List<SObject>{ new Account(), new Case() }
 );
 ```
+
+### Numbered values
+
+Use `{0}` anywhere in a string default, flavour value, or caller-supplied field value, such as `Account.Name => 'Default Account {0}'` or `new Account(Name = 'Hello {0}')`. Every occurrence is replaced with the record's sequence number, starting at **1 per SObject type per Apex transaction**. Further `create` calls continue that object's sequence; different objects have independent counters. A new transaction starts again at 1, so this is not a globally unique identifier.
+
+```java
+List<SObject> accounts = DataFactory.create(Account.SObjectType, 2);
+// Names: Default Account 1, Default Account 2
+Account nextAccount = (Account) DataFactory.create(new Account());
+// Name: Default Account 3
+Account customAccount = (Account) DataFactory.create(
+  new Account(Name = 'Hello {0}')
+);
+// Name: Hello 4
+```
+
+Every built record advances its object's counter, even if its configuration or caller values have no placeholders. Empty calls do not advance counters. Plain strings, non-string values, and explicit nulls remain unchanged.
+
+Configuration getters such as `getBaseDefaults`, `getConfiguredValues`, and the LWC `getFlavourDefaults` return the original templates without consuming numbers. Substitution happens when `DataFactory.create` builds the record, including when a template is passed back as an explicit field value.
 
 ## LWC Usage
 
