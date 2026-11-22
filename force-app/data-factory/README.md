@@ -141,3 +141,7 @@ Two examples let you pick a configured Object and Flavour dynamically, edit the 
 ## Testing
 
 Apex behaviour is tested by `DataFactoryTest`, `DataFactoryControllerTest`, `DataFactoryFlowCreateTest`, `DataFactoryFlowFlavourPicklistTest`, `DataFactoryFlowFlavoursTest`, and `DataFactoryFlowObjectsTest`. All Apex tests install a self-contained test configuration via `DataFactoryTest.useTestConfig()`, so changing production objects, flavours, or default field values in `DataFactory` does not require updating tests. The Jest tests mock Apex and GraphQL and only cover the LWCs themselves.
+
+## Agent Skill
+
+The [apex-data-factory](../../.agents/skills/apex-data-factory/SKILL.md) agent skill instructs coding agents to use `DataFactory` as the base when creating SObject records in Apex (production code, tests, and anonymous scripts). It covers the `DataFactory.create` overloads, `{0}` numbering, extending [DataFactoryConfig](apex/DataFactoryConfig.cls), and common Apex pitfalls such as avoiding direct `(List<Account>)` casts on `List<SObject>` results.
