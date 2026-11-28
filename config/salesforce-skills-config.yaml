@@ -34,5 +34,5 @@ saveOptions:
     - .claude/skills/ # Claude
     - .github/skills/ # GitHub Copilot, GitHub.com
 installedVersion:
-  version: "1.71.0"
-  released: "2026-11-20"
+  version: "1.72.0"
+  released: "2026-11-27"
